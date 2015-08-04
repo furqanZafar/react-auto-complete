@@ -43,9 +43,7 @@ App = React.create-class do
                     @request.abort! if !!@request
                     @request = $.getJSON "scripts?q=#{value}"
                         ..done (scripts) ~> @set-state {scripts}
-                        ..fail ~> 
-                            console.log "unable to fetch scripts", arguments
-                            @set-state {scripts: []}
+                        ..fail ~> console.log "unable to fetch scripts", arguments
 
             div {class-name: \copy-right}, 'Copyright © Furqan Zafar 2014. MIT Licensed.'
 
