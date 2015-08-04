@@ -1,13 +1,20 @@
-browserify = require \browserify
-fs = require \fs
-gulp = require \gulp
-gulp-connect = require \gulp-connect
-gulp-livescript = require \gulp-livescript
-gulp-util = require \gulp-util
-stylus = require \gulp-stylus
+require! \browserify
+require! \fs
+require! \gulp
+require! \gulp-livescript
+require! \gulp-nodemon
+require! \gulp-util
+require! \gulp-stylus
+io = (require \socket.io)!
+    ..listen 8001
 {basename, dirname, extname} = require \path
 source = require \vinyl-source-stream
-watchify = require \watchify
+require! \watchify
+
+emit-with-delay = (event) ->
+    set-timeout do 
+        -> io.emit event
+        200
 
 create-bundler = (entries) ->
     bundler = browserify {} <<< watchify.args <<< {debug: true}
@@ -20,42 +27,44 @@ bundle = (bundler, {file, directory}:output) ->
         .on \error, -> console.log arguments
         .pipe source file
         .pipe gulp.dest directory
-        .pipe gulp-connect.reload!
 
-##
-# Example
-##
+# Example styles
 gulp.task \build:example:styles, ->
-    gulp.src <[./example/src/App.styl]>
-    .pipe stylus!
-    .pipe gulp.dest './example/dist'
-    .pipe gulp-connect.reload!
+    gulp.src <[./example/public/components/App.styl]>
+    .pipe gulp-stylus!
+    .pipe gulp.dest './example/public/components'
+    .on \end, -> emit-with-delay \build-complete if !!io
 
 gulp.task \watch:example:styles, -> 
-    gulp.watch <[./example/src/*.styl ./src/*.styl]>, <[build:example:styles]>    
+    gulp.watch <[./example/public/components/*.styl ./src/*.styl]>, <[build:example:styles]>
 
-example-bundler = create-bundler \./example/src/App.ls
-bundle-example = -> bundle example-bundler, {file: "App.js", directory: "./example/dist/"}
+# Example scripts
+example-bundler = create-bundler \./example/public/components/App.ls
+bundle-example = -> bundle example-bundler, {file: "App.js", directory: "./example/public/components/"}
 
 gulp.task \build:example:scripts, ->
     bundle-example!
 
 gulp.task \watch:example:scripts, ->
-    example-bundler.on \update, -> bundle-example!
-    example-bundler.on \time, (time) -> gulp-util.log "App.js built in #{time} seconds"
+    example-bundler.on \update, -> 
+        emit-with-delay \build-start if !!io
+        bundle-example!
+    example-bundler.on \time, (time) -> 
+        emit-with-delay \build-complete if !!io
+        gulp-util.log "App.js built in #{time} seconds"
 
+# Example server
 gulp.task \dev:server, ->
-    gulp-connect.server do
-        livereload: true
-        port: 8000
-        root: \./example/
+    gulp-nodemon do
+        exec-map: ls: \lsc
+        ext: \ls
+        ignore: <[.gitignore gulpfile.ls *.sublime-project README.md]>
+        script: \./example/server.ls
 
-##
 # Source
-##
 gulp.task \build:src:styles, ->
     gulp.src <[./src/AutoComplete.styl]>
-    .pipe stylus!
+    .pipe gulp-stylus!
     .pipe gulp.dest './src'
 
 gulp.task \watch:src:styles, -> 

@@ -1,14 +1,11 @@
 {filter, map} = require \prelude-ls
 {clamp} = require \prelude-extension
 {DOM:{div, input, span}}:React = require \react
-require! \react-onclickoutside
 require! \./SimpleOption
 
 module.exports = React.create-class do
 
     display-name: \AutoComplete
-
-    mixins: [react-onclickoutside]
 
     # render :: a -> ReactElement
     render: ->
@@ -36,7 +33,7 @@ module.exports = React.create-class do
                         # let the parent component know that its time to update the value
                         @props.on-change value
 
-                    on-key-down: ({which, prevent-default}) ~>
+                    on-key-down: ({which}:e) ~>
                         match which
                             | 13 => 
                                 @set-state {open: false}, ~>
@@ -51,7 +48,8 @@ module.exports = React.create-class do
                             | 38 => @focus-adjacent-option -1
                             | 40 => @focus-adjacent-option 1
                             | _ => return
-                        false
+                        e.prevent-default!
+                        e.stop-propagation!
 
                 # RESET BUTTON
                 div do 
@@ -117,11 +115,6 @@ module.exports = React.create-class do
         @set-state do
             focused-option: clamp (@state.focused-option + direction), 0, (@filter-options @props.value).length - 1
             open: true
-
-    # close the list of options when the user clicks outside (required by the on-click-outside mixin)
-    # handle-click-outside :: a -> Void
-    handle-click-outside: !->
-        @set-state open: false
 
     # reset : a -> Void
     reset: !-> @props.on-change ""

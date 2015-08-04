@@ -10705,22 +10705,6 @@
     ]
   },
   {
-    "name": "bootstrap",
-    "value": "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.4/js/bootstrap.min.js",
-    "tokens": [
-      "bootstrap",
-      "twitter-bootstrap",
-      "css",
-      "less",
-      "mobile-first",
-      "responsive",
-      "front-end",
-      "framework",
-      "web",
-      "twitter"
-    ]
-  },
-  {
     "name": "twitterlib.js",
     "value": "http://cdnjs.cloudflare.com/ajax/libs/twitterlib.js/1.0.8/twitterlib.min.js",
     "tokens": [

@@ -4,24 +4,21 @@ React = require \react
 
 module.exports = React.create-class do
 
-    display-name: \LibraryOption
+    display-name: \ScriptOption
 
     statics:
 
-        # [LibraryOption] -> String -> [LibraryOption]
-        filter: (list, search) ->
-            list |> filter ({name, value, tokens}) -> 
-                [name, value] |> any -> (it.to-lower-case!.index-of search.to-lower-case!) > -1
-                # tokens |> any -> (it.index-of search.to-lower-case!) > -1
+        # [ScriptOption] -> String -> [ScriptOption]
+        filter: (list, search) -> list
 
     render: ->
 
         {on-click, on-mouse-over, on-mouse-out, focused, name, value} = @props
 
-        # LibraryOption
+        # ScriptOption
         div do 
             {
-                class-name: "library-option #{if focused then \focused else ''}"
+                class-name: "script-option #{if focused then \focused else ''}"
                 on-click
                 on-mouse-over
                 on-mouse-out

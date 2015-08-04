@@ -1,7 +1,6 @@
-{filter, find, map} = require \prelude-ls
 {partition-string} = require \prelude-extension
-React = require \react
-{div, input, span} = React.DOM
+{filter, find, map} = require \prelude-ls
+{DOM:{div, input, span}}:React = require \react
 
 module.exports = React.create-class do
 
@@ -18,10 +17,7 @@ module.exports = React.create-class do
 
     # render :: a -> ReactElement
     render: ->
-
-        {on-click, on-mouse-over, on-mouse-out, focused, index, label, value, add-options, new-option, partitions} = @props
-
-        # SimpleOption
+        {on-click, on-mouse-over, on-mouse-out, focused, label, partitions} = @props
         div do 
             {
                 class-name: "simple-option #{if focused then \focused else ''}"
@@ -29,12 +25,7 @@ module.exports = React.create-class do
                 on-mouse-over
                 on-mouse-out
             }
-            if add-options and (index == 0 and !!new-option)
-                span null, "Add #{label}..."
-            else
-                partitions |> map ([start, end, highlight]) ~> 
-                    span do
-                        if highlight then {class-name: \highlight} else null
-                        label.substring start, end
-
-
+            partitions |> map ([start, end, highlight]) ~> 
+                span do
+                    {key: start, class-name: if highlight then \highlight else ''}
+                    label.substring start, end
