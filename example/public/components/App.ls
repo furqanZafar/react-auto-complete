@@ -11,7 +11,7 @@ App = React.create-class do
         div null,
             div {class-name: \title}, 'React Auto Complete'
             div {class-name: \description}, 'A flexible and beautiful Select input control for ReactJS with multiselect & autocomplete'
-            a {class-name: \github-link, href: 'http://github.com/furqanZafar/react-select/tree/develop', target: \_blank}, 'View project on GitHub'
+            a {class-name: \github-link, href: 'http://github.com/furqanZafar/react-auto-complete', target: \_blank}, 'View project on GitHub'
             h1 null, 'Examples:'
 
             # SIMPLE AUTOCOMPLETE
