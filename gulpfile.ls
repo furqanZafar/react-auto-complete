@@ -3,7 +3,9 @@ require! \fs
 require! \gulp
 require! \gulp-livescript
 require! \gulp-nodemon
+require! \gulp-uglify
 require! \gulp-util
+require! \gulp-streamify
 require! \gulp-stylus
 io = (require \socket.io)!
     ..listen 8001
@@ -17,7 +19,7 @@ emit-with-delay = (event) ->
         200
 
 create-bundler = (entries) ->
-    bundler = browserify {} <<< watchify.args <<< {debug: true}
+    bundler = browserify {} <<< watchify.args <<< {debug: false}
     bundler.add entries
     bundler.transform \liveify
     watchify bundler
@@ -26,6 +28,7 @@ bundle = (bundler, {file, directory}:output) ->
     bundler.bundle!
         .on \error, -> console.log arguments
         .pipe source file
+        .pipe gulp-streamify gulp-uglify!
         .pipe gulp.dest directory
 
 # Example styles
