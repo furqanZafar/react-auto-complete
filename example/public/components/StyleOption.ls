@@ -13,6 +13,7 @@ module.exports = React.create-class do
             list |> filter ({name, value, tokens}) -> 
                 [name, value] |> any -> (it.to-lower-case!.index-of search.to-lower-case!) > -1
 
+    #render :: a -> ReactElement
     render: ->
 
         {on-click, on-mouse-over, on-mouse-out, focused, name, value} = @props

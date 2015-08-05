@@ -11,6 +11,7 @@ module.exports = React.create-class do
         # [ScriptOption] -> String -> [ScriptOption]
         filter: (list, search) -> list
 
+    # a -> ReactElement
     render: ->
 
         {on-click, on-mouse-over, on-mouse-out, focused, name, value} = @props

@@ -7,6 +7,7 @@ require! \./StyleOption.ls
 
 App = React.create-class do
 
+    # render :: a -> ReactElement
     render: -> 
         div null,
             div {class-name: \title}, 'React Auto Complete'
@@ -46,6 +47,7 @@ App = React.create-class do
 
             div {class-name: \copy-right}, 'Copyright © Furqan Zafar 2014. MIT Licensed.'
 
+    # get-initial-state :: a -> UIState
     get-initial-state: ->
         scripts: []
         selected-script: "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"
@@ -56,7 +58,8 @@ App = React.create-class do
         styles: []
         selected-style: "http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css"
 
-    component-will-mount: ->
+    # component-will-mount :: a -> Void
+    component-will-mount: !->
         $.getJSON "data/styles.json"
             ..done (styles) ~> @set-state {styles}
             ..fail -> console.log "unable to fetch styles"

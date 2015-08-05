@@ -13,18 +13,21 @@ io = (require \socket.io)!
 source = require \vinyl-source-stream
 require! \watchify
 
-emit-with-delay = (event) ->
+# emit-with-delay :: String -> Void
+emit-with-delay = (event) !->
     set-timeout do 
         -> io.emit event
         200
 
-create-bundler = (entries) ->
+# create-bundler :: String -> Bundler
+create-bundler = (entry) !->
     bundler = browserify {} <<< watchify.args <<< {debug: false}
-    bundler.add entries
+    bundler.add entry
     bundler.transform \liveify
     watchify bundler
 
-bundle = (bundler, {file, directory}:output) ->
+# bundle :: Bundler -> BundleOptions -> Void
+bundle = (bundler, {file, directory}:output) !->
     bundler.bundle!
         .on \error, -> console.log arguments
         .pipe source file

@@ -103,12 +103,10 @@ module.exports = React.create-class do
         result = (@props.option-class or SimpleOption).filter @props.options, search
         [0 til result.length] |> map (index) -> result[index] <<< {index}
 
-    # focuses on the cursor search input
     # focus :: a -> Void
     focus: !->
         @refs.search.getDOMNode!.focus!
 
-    # highlights the option before or after the current highlight option
     # focus-adjacent-option :: Number -> Void
     focus-adjacent-option: (direction) !->
         {values} = @props
