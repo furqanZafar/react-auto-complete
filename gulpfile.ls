@@ -20,7 +20,7 @@ emit-with-delay = (event) !->
         200
 
 # create-bundler :: String -> Bundler
-create-bundler = (entry) !->
+create-bundler = (entry) ->
     bundler = browserify {} <<< watchify.args <<< {debug: false}
     bundler.add entry
     bundler.transform \liveify
