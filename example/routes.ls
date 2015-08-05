@@ -24,7 +24,8 @@ module.exports = do ->
             err, scripts <- to-callback do ->
                 if scripts == null
                     json-string <- bindP (from-error-value-callback read-file) "#__dirname/data/scripts.json", \utf8
-                    returnP JSON.parse json-string
+                    scripts := JSON.parse json-string
+                    returnP scripts
                 else
                     returnP scripts
             return die res, err if !!err
