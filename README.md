@@ -1,6 +1,6 @@
 # Install
 
-`sudo npm install react-auto-complete`
+`npm install react-auto-complete`
 
 # Usage
 
