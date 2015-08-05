@@ -1,7 +1,7 @@
 $ = require \jquery-browserify
 {concat-map, filter, map} = require \prelude-ls
 {DOM:{a, div, h1, h2}}:React = require \react
-AutoComplete = require \../../../src/AutoComplete
+AutoComplete = React.create-factory require \../../../src/AutoComplete
 require! \./ScriptOption.ls
 require! \./StyleOption.ls
 
@@ -17,16 +17,14 @@ App = React.create-class do
 
             # SIMPLE AUTOCOMPLETE
             h2 null, 'List of fruits using default item renderer:'
-            React.create-element do
-                AutoComplete
+            AutoComplete do
                 value: @state.selected-fruit
                 options: @state.fruits
                 on-change: (value) ~> @set-state selected-fruit: value
 
             # CUSTOM AUTOCOMPLETE
             h2 {style: {margin-top: \30px}}, 'List of stylesheets using a custom item renderer:'
-            React.create-element do
-                AutoComplete
+            AutoComplete do
                 value: @state.selected-style
                 options: @state.styles
                 option-class: StyleOption
@@ -34,8 +32,7 @@ App = React.create-class do
 
             # AJAX AUTOCOMPLETE
             h2 {style: {margin-top: \30px}}, 'List of scripts fetched from server:'
-            React.create-element do 
-                AutoComplete
+            AutoComplete do 
                 value: @state.selected-script
                 options: @state.scripts
                 option-class: ScriptOption

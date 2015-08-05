@@ -30,14 +30,19 @@ module.exports = do ->
                     returnP scripts
             return die res, err if !!err
 
+            search-string = (req?.query?.q ? "").to-lower-case!
+
             res.set \content-type, \application/javascript
             res.end do 
                 scripts
-                    |> filter -> 
-                        [it?.name, it?.value]
-                            |> filter -> !!it
-                            |> map (.to-lower-case!)
-                            |> any -> (it.index-of (req?.query?.q ? "").to-lower-case!) > -1
+                    |> filter -> !!it?.name and !!it?.value
+                    |> map ({name, value}:script) ->
+                        {} <<< script <<< 
+                            index: [name, value] 
+                                |> map -> it.index-of search-string
+                                |> filter (> -1)
+                                |> minimum
+                    |> filter -> !!it.index
                     |> map ({name, value}) -> {name, value}
                     |> take 20
                     |> pretty
