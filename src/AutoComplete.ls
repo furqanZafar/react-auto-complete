@@ -84,6 +84,7 @@ module.exports = React.create-class do
                     (@filter-options @props.value) |> map ({index, value}:option-object) ~>
                         div do 
                             key: value
+                            ref: "option-#{index}"
                             on-click: (e) ~>
                                 @set-state open: false, ~>
                                     @select-option index
@@ -95,8 +96,7 @@ module.exports = React.create-class do
                             React.create-element do 
                                 option-class or SimpleOption
                                 {} <<< option-object <<<
-                                    key: value
-                                    ref: "option-#{index}"
+                                    key: value                                    
                                     focused: index == focused-option
     
     # get-initial-state :: a -> UIState
