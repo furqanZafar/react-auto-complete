@@ -18,23 +18,28 @@ App = React.create-class do
             # SIMPLE AUTOCOMPLETE
             h2 null, 'List of fruits using default item renderer:'
             AutoComplete do
+                placeholder: \apple
                 value: @state.selected-fruit
                 options: @state.fruits
                 on-change: (value) ~> @set-state selected-fruit: value
 
-            # CUSTOM AUTOCOMPLETE
+            # CUSTOM AUTOCOMPLETE WITH VALIDATION
             h2 {style: {margin-top: \30px}}, 'List of stylesheets using a custom item renderer:'
             AutoComplete do
+                class-name: if @state.valid-style then '' else \invalid
+                placeholder: \http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css
                 value: @state.selected-style
                 options: @state.styles
                 option-class: StyleOption
+                on-blur: (value) ~> @set-state valid-style: /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/.test value
                 on-change: (value) ~> @set-state selected-style: value
 
             # AJAX AUTOCOMPLETE
             h2 {style: {margin-top: \30px}}, 'List of scripts fetched from server:'
             AutoComplete do 
+                placeholder: \http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js
                 value: @state.selected-script
-                options: @state.scripts
+                options: @state.scripts 
                 option-class: ScriptOption
                 on-change: (value) ~>
                     @set-state selected-script: value
@@ -47,13 +52,14 @@ App = React.create-class do
     # get-initial-state :: a -> UIState
     get-initial-state: ->
         scripts: []
-        selected-script: "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"
+        selected-script: ""
 
         fruits: <[apple banana grapes strawberry pineapple orange mango]> |> map (fruit) -> {label: fruit, value: fruit}
-        selected-fruit: "apple"
+        selected-fruit: ""
 
         styles: []
-        selected-style: "http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.2/normalize.min.css"
+        selected-style: ""
+        valid-style: true
 
     # component-will-mount :: a -> Void
     component-will-mount: !->

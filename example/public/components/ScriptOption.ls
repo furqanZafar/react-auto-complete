@@ -14,15 +14,10 @@ module.exports = React.create-class do
     # a -> ReactElement
     render: ->
 
-        {on-click, on-mouse-over, on-mouse-out, focused, name, value} = @props
+        {focused, name, value} = @props
 
         # ScriptOption
         div do 
-            {
-                class-name: "script-option #{if focused then \focused else ''}"
-                on-click
-                on-mouse-over
-                on-mouse-out
-            }
+            class-name: "script-option #{if focused then \focused else ''}"
             div {style:{font-weight: \bold}}, name
             div {style:{font-size: \0.8em}}, value

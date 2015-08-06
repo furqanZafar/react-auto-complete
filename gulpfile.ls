@@ -17,7 +17,7 @@ require! \watchify
 emit-with-delay = (event) !->
     set-timeout do 
         -> io.emit event
-        200
+        0
 
 # create-bundler :: String -> Bundler
 create-bundler = (entry) ->
@@ -57,7 +57,7 @@ gulp.task \watch:example:scripts, ->
         bundle-example!
     example-bundler.on \time, (time) -> 
         emit-with-delay \build-complete if !!io
-        gulp-util.log "App.js built in #{time} seconds"
+        gulp-util.log "App.js built in #{time / 1000} seconds"
 
 # Example server
 gulp.task \dev:server, ->

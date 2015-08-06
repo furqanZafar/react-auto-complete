@@ -10,78 +10,97 @@ module.exports = React.create-class do
     # render :: a -> ReactElement
     render: ->
         {
-            props: {options, placeholder-text, option-class}
+            props: {options, placeholder, option-class}
             state: {focused-option, open}
         } = @
 
         # MULTISELECT
         div do 
-            class-name: "auto-complete #{if open then 'open' else ''}"
+            class-name: "auto-complete #{if open then 'open' else ''} #{if @props?.class-name then @props.class-name else ''}"
             div do 
-                {class-name: \control, key: \control, style: @props.style ? {}}
+                {class-name: \control, key: \control}
 
                 # SEARCH INPUT BOX
                 input do
+                    placeholder: placeholder
                     ref: \search
                     type: \text
                     value: @props.value
                     on-change: ({current-target:{value}}) ~>
-                        @set-state do
-                            focused-option: 0
-                            open: @state.open or (value.length > 0)
-
-                        # let the parent component know that its time to update the value
                         @props.on-change value
-
+                        @set-state focused-option: 0, open: value.length > 0
                     on-key-down: ({which}:e) ~>
-                        match which
-                            | 13 => 
-                                @set-state {open: false}, ~>
-                                    @select-option @state.focused-option
+
+                        # do not prevent default in case of TAB key
+                        if which == 9
+                            @set-state open: false, ~>
+                                @props.on-blur @props.value if !!@props?.on-blur
+
+                        # for all the following keys prevent default action after processing them
+                        else
+
+                            match which
+
+                                # ENTER
+                                | 13 => 
+                                    @set-state {open: false}, ~>
+                                        @select-option @state.focused-option
+                                        @focus!
+
+                                # ESCAPE
+                                | 27 =>
+                                    if @state.open
+                                        @set-state open: false
+                                    else
+                                        @reset!
                                     @focus!
-                            | 27 =>
-                                if @state.open
-                                    @set-state open: false
-                                else
-                                    @reset!
-                                @focus!
-                            | 38 => @focus-adjacent-option -1
-                            | 40 => @focus-adjacent-option 1
-                            | _ => return
-                        e.prevent-default!
-                        e.stop-propagation!
+
+                                # UP
+                                | 38 => @focus-adjacent-option -1
+
+                                # DOWN
+                                | 40 => @focus-adjacent-option 1
+                                | _ => return
+                            
+                            e.prevent-default!
+                            e.stop-propagation!
 
                 # RESET BUTTON
-                div do 
-                    class-name: \reset
-                    on-click: ~> @reset!; @focus!; false
-                    \×
-
-                # ARROW ICON
-                div {class-name: \arrow}, null
+                if @props.value.length > 0
+                    div do 
+                        class-name: \reset
+                        on-click: (e) ~> 
+                            @set-state open: false
+                            @reset!
+                            @focus!
+                            e.prevent-default!
+                            e.stop-propagation!
+                        \×
 
             # LIST OF OPTIONS
             if open
                 div do 
                     {class-name: \options, key: \options}
                     (@filter-options @props.value) |> map ({index, value}:option-object) ~>
-                        React.create-element do 
-                            option-class or SimpleOption
-                            {} <<< option-object <<<
-                                key: "#{value}"
-                                ref: "option-#{index}"
-                                focused: index == focused-option
-                                on-click: ~>
-                                    @set-state {open: false}, ~>
-                                        @select-option index
-                                        @focus!
-                                    false
-                                on-mouse-over: ~> @set-state focused-option: index
-                                on-mouse-out: ~> @set-state focused-option: -1
+                        div do 
+                            key: value
+                            on-click: (e) ~>
+                                @set-state open: false, ~>
+                                    @select-option index
+                                    @focus!
+                                e.prevent-default!
+                                e.stop-propagation!
+                            on-mouse-over: ~> @set-state focused-option: index
+                            on-mouse-out: ~> @set-state focused-option: -1
+                            React.create-element do 
+                                option-class or SimpleOption
+                                {} <<< option-object <<<
+                                    key: value
+                                    ref: "option-#{index}"
+                                    focused: index == focused-option
     
     # get-initial-state :: a -> UIState
-    get-initial-state: -> 
-        focused-option: 0, open: false
+    get-initial-state: -> focused-option: 0, open: false
 
     # component-did-update :: a -> Void
     component-did-update: !->
@@ -104,15 +123,12 @@ module.exports = React.create-class do
         [0 til result.length] |> map (index) -> result[index] <<< {index}
 
     # focus :: a -> Void
-    focus: !->
-        @refs.search.getDOMNode!.focus!
+    focus: !-> @refs.search.getDOMNode!.focus!
 
     # focus-adjacent-option :: Number -> Void
     focus-adjacent-option: (direction) !->
         {values} = @props
-        @set-state do
-            focused-option: clamp (@state.focused-option + direction), 0, (@filter-options @props.value).length - 1
-            open: true
+        @set-state open: true, focused-option: clamp (@state.focused-option + direction), 0, (@filter-options @props.value).length - 1
 
     # reset : a -> Void
     reset: !-> @props.on-change ""
@@ -121,6 +137,4 @@ module.exports = React.create-class do
     select-option: (index) !->
         filtered-options = @filter-options @props.value
         {value}:option? = filtered-options?[index]
-        if !!value
-            @props.on-change value
-
+        @props.on-change value if !!value

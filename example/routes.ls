@@ -1,7 +1,7 @@
 {promises: {bindP, from-error-value-callback, returnP, to-callback}} = require \async-ls
 require! \express
 {read-file} = require \fs
-{any, filter, map, take} = require \prelude-ls
+{any, filter, map, minimum, sort-by, take} = require \prelude-ls
 
 # :: a -> [ExpressRoute]
 module.exports = do ->
@@ -32,17 +32,19 @@ module.exports = do ->
 
             search-string = (req?.query?.q ? "").to-lower-case!
 
+            <- set-timeout _, 350
             res.set \content-type, \application/javascript
             res.end do 
                 scripts
                     |> filter -> !!it?.name and !!it?.value
                     |> map ({name, value}:script) ->
-                        {} <<< script <<< 
+                        {} <<< script <<<
                             index: [name, value] 
-                                |> map -> it.index-of search-string
+                                |> map -> it.to-lower-case!.index-of search-string
                                 |> filter (> -1)
                                 |> minimum
-                    |> filter -> !!it.index
+                    |> filter -> typeof it.index != \undefined
+                    |> sort-by (.index)
                     |> map ({name, value}) -> {name, value}
                     |> take 20
                     |> pretty
