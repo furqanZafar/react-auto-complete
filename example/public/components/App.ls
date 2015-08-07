@@ -9,6 +9,9 @@ App = React.create-class do
 
     # render :: a -> ReactElement
     render: -> 
+        
+        url-regex = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/
+
         div null,
             div {class-name: \title}, 'React Auto Complete'
             div {class-name: \description}, 'A flexible and beautiful Select input control for ReactJS with multiselect & autocomplete'
@@ -31,8 +34,12 @@ App = React.create-class do
                 value: @state.selected-style
                 options: @state.styles
                 option-class: StyleOption
-                on-blur: (value) ~> @set-state valid-style: /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/.test value
-                on-change: (value) ~> @set-state selected-style: value
+                on-blur: (value) ~> @set-state valid-style: url-regex.test value
+                on-change: (value) ~> 
+                    @set-state do 
+                        selected-style: value
+                        valid-style: if !@state.valid-style then url-regex.test value else @state.valid-style
+
 
             # AJAX AUTOCOMPLETE
             h2 {style: {margin-top: \30px}}, 'List of scripts fetched from server:'

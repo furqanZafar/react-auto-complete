@@ -17,14 +17,9 @@ module.exports = React.create-class do
 
     # render :: a -> ReactElement
     render: ->
-        {on-click, on-mouse-over, on-mouse-out, focused, label, partitions} = @props
+        {focused, label, partitions} = @props
         div do 
-            {
-                class-name: "simple-option #{if focused then \focused else ''}"
-                on-click
-                on-mouse-over
-                on-mouse-out
-            }
+            class-name: "simple-option #{if focused then \focused else ''}"
             partitions |> map ([start, end, highlight]) ~> 
                 span do
                     {key: start, class-name: if highlight then \highlight else ''}

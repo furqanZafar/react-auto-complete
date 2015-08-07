@@ -7,34 +7,41 @@ module.exports = React.create-class do
 
     display-name: \AutoComplete
 
+    # get-default-props :: a -> Props
+    get-default-props: ->
+        class-name: ""
+        on-blur: (->)
+        on-change: (->)
+        option-class: SimpleOption
+        options: []
+        placeholder: ""
+        value: ""
+
     # render :: a -> ReactElement
     render: ->
-        {
-            props: {options, placeholder, option-class}
-            state: {focused-option, open}
-        } = @
-
-        # MULTISELECT
+        
+        # AUTOCOMPLETE
         div do 
-            class-name: "auto-complete #{if open then 'open' else ''} #{if @props?.class-name then @props.class-name else ''}"
+            class-name: "auto-complete #{if @state.open then 'open' else ''} #{@props.class-name}"
             div do 
                 {class-name: \control, key: \control}
 
                 # SEARCH INPUT BOX
                 input do
-                    placeholder: placeholder
+                    placeholder: @props.placeholder
                     ref: \search
                     type: \text
                     value: @props.value
                     on-change: ({current-target:{value}}) ~>
                         @props.on-change value
-                        @set-state focused-option: 0, open: value.length > 0
+                        @set-state focused-option: 0, open: (@filter-options value).length > 0
+
                     on-key-down: ({which}:e) ~>
 
                         # do not prevent default in case of TAB key
                         if which == 9
                             @set-state open: false, ~>
-                                @props.on-blur @props.value if !!@props?.on-blur
+                                @props.on-blur @props.value
 
                         # for all the following keys prevent default action after processing them
                         else
@@ -52,7 +59,7 @@ module.exports = React.create-class do
                                     if @state.open
                                         @set-state open: false
                                     else
-                                        @reset!
+                                        @clean!
                                     @focus!
 
                                 # UP
@@ -71,14 +78,14 @@ module.exports = React.create-class do
                         class-name: \reset
                         on-click: (e) ~> 
                             @set-state open: false
-                            @reset!
+                            @clean!
                             @focus!
                             e.prevent-default!
                             e.stop-propagation!
                         \×
 
             # LIST OF OPTIONS
-            if open
+            if @state.open
                 div do 
                     {class-name: \options, key: \options}
                     (@filter-options @props.value) |> map ({index, value}:option-object) ~>
@@ -94,10 +101,10 @@ module.exports = React.create-class do
                             on-mouse-over: ~> @set-state focused-option: index
                             on-mouse-out: ~> @set-state focused-option: -1
                             React.create-element do 
-                                option-class or SimpleOption
+                                @props.option-class
                                 {} <<< option-object <<<
-                                    key: value                                    
-                                    focused: index == focused-option
+                                    key: value
+                                    focused: index == @state.focused-option
     
     # get-initial-state :: a -> UIState
     get-initial-state: -> focused-option: 0, open: false
@@ -130,8 +137,8 @@ module.exports = React.create-class do
         {values} = @props
         @set-state open: true, focused-option: clamp (@state.focused-option + direction), 0, (@filter-options @props.value).length - 1
 
-    # reset : a -> Void
-    reset: !-> @props.on-change ""
+    # clean : a -> Void
+    clean: !-> @props.on-change ""
         
     # select-option :: Number -> Void
     select-option: (index) !->

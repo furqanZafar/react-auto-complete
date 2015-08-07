@@ -32,7 +32,6 @@ module.exports = do ->
 
             search-string = (req?.query?.q ? "").to-lower-case!
 
-            <- set-timeout _, 350
             res.set \content-type, \application/javascript
             res.end do 
                 scripts
